@@ -3,8 +3,9 @@ from aiogram.types import Message, CallbackQuery,ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.types.input_file import FSInputFile
 from texts import GENDER_TEXT, CATEGORY_TEXT, REGISTERED_TEXT, SEASON_TEXT, select_filter
-from buttons import GENDER_BUTTON,REGISTER_SUCCESS_BUTTONS, CATEGORY_BUTTONS, SEASON_BUTTONS
+from buttons import GENDER_BUTTON,REGISTER_SUCCESS_BUTTONS, SEASON_BUTTONS, category_button
 from states import MenuOption
+from database import get_filter_products, get_category_by_id
 
 
 user_router=Router()
@@ -34,7 +35,7 @@ async def get_gender_router(call:CallbackQuery, st:FSMContext):
         await st.set_state(MenuOption.category)
         
         await call.message.edit_caption(caption=CATEGORY_TEXT)
-        await call.message.edit_reply_markup(reply_markup=CATEGORY_BUTTONS)
+        await call.message.edit_reply_markup(reply_markup=category_button())
 
         
 @user_router.callback_query(F.data.startswith("category_"))
@@ -60,14 +61,17 @@ async def send_product_by_filter(call:CallbackQuery, st:FSMContext):
     
     if season=="Back":
         await call.message.edit_caption(caption=CATEGORY_TEXT)
-        await call.message.edit_reply_markup(reply_markup=CATEGORY_BUTTONS)
+        await call.message.edit_reply_markup(reply_markup=category_id)
     else:
-       data= await st.get_data()
-       gender=data.get("gender").capitalize()
-       category=data.get("category").capitalize()
-       await st.clear()
-       
-       await call.message.edit_reply_markup(reply_markup=None)
-       await call.message.answer(text=select_filter(gender,category, season)) 
+        data= await st.get_data()
+        gender=data.get("gender").capitalize()
+        category_id=data.get("category").capitalize()
+        await st.clear()
         
-    
+        await call.message.edit_reply_markup(reply_markup=None)
+        
+        category_name=get_category_by_id(category_id)[0]
+        
+        
+        await call.message.answer(text=select_filter(gender,category_name, season)) 
+        data=get_filter_products(category_id, season, gender)

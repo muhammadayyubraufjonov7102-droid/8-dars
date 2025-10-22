@@ -2,6 +2,12 @@ from aiogram.types import (
     KeyboardButton, ReplyKeyboardMarkup,
     InlineKeyboardButton, InlineKeyboardMarkup)
 
+
+from database import get_category
+
+
+
+
 GENDER_BUTTON=InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text="👨 Male", callback_data="menu_gender_male")],
@@ -11,23 +17,26 @@ GENDER_BUTTON=InlineKeyboardMarkup(
     ]
 )
 
-CATEGORY_BUTTONS=InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="👕 Shirt", callback_data="cat_shirt"),
-        InlineKeyboardButton(text="👟 Shoes", callback_data="cat_shoes"),
-        InlineKeyboardButton(text="🧢 Cap", callback_data="cat_cap"),
-    ],
-    [
-        InlineKeyboardButton(text="🧥 Jacket", callback_data="cat_jacket"),
-        InlineKeyboardButton(text="👖 Trousers", callback_data="cat_trousers"),
-        InlineKeyboardButton(text="🧩 Accessory", callback_data="cat_accessory"),
-    ],
-    [
-        InlineKeyboardButton(text="🤵 Suit", callback_data="cat_suit"),
-        InlineKeyboardButton(text="👜 Bag", callback_data="cat_bag"),
-        InlineKeyboardButton(text="🔙 Back", callback_data="cat_back"),
-    ],
-])
+
+def category_button():
+    inline_keyboard=[]
+    button=[]
+    data=get_category()
+    
+    for i in range(1,len(data)+1):
+        button.append(InlineKeyboardButton(text=data[i-1][1], callback_data=f"category_{data[i-1][0]}"))
+        if i%2==0:
+            inline_keyboard.append(button)
+            button=[]
+            
+    if button:
+        inline_keyboard.append(button)
+    inline_keyboard.append([InlineKeyboardButton(text="🔙 Back", callback_data="cat_back")])
+    
+    return InlineKeyboardMarkup(
+        inline_keyboard=inline_keyboard
+    )  
+        
 
 SEASON_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[
     [
