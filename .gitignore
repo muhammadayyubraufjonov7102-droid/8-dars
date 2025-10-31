@@ -1,0 +1,34 @@
+# OS fayllari
+.DS_Store
+Thumbs.db
+
+# IDE va muharrirlar
+.vscode/
+.idea/
+*.code-workspace
+
+# Virtual muhitlar
+venv/
+env/
+ENV/
+*.pyc
+__pycache__/
+
+# Log va cache fayllar
+*.log
+*.cache
+*.pid
+*.seed
+*.tmp
+*.bak
+
+# Test natijalari
+coverage/
+.pytest_cache/
+
+# Arxivlar va vaqtinchalik fayllar
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
