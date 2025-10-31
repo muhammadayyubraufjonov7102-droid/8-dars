@@ -1,68 +1,73 @@
-from psycopg2 import connect
+from sqlite3 import connect
 from environs import Env
-
-env=Env()
-env.read_env()
 
 
 def get_connect():
-    return connect(
-        user=env.str("USER"),
-        password=env.str("PASSWORD"),
-        host=env.str("HOST"),
-        port=env.str("PORT"),
-        database=env.str("DATABASE")
-    )
+    return connect("optom_shop.sqlite3")
+
+
 
 def create_table():
-    sql="""
-    -- Foydalanuvchilar jadvali
-CREATE TABLE IF NOT EXISTS admin (
-    id SERIAL PRIMARY KEY,
-    full_name VARCHAR(200 ) NOT NULL,
-    phone VARCHAR(50) UNIQUE NOT NULL,
-    address TEXT NOT NULL,
-    chat_id BIGINT UNIQUE NOT NULL,
-    gender VARCHAR(50 ),
-    is_admin BOOLEAN DEFAULT FALSE,
-    is_block BOOLEAN DEFAULT FALSE
-);
+    tables = [
+        """
+        CREATE TABLE IF NOT EXISTS admin (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            phone TEXT UNIQUE NOT NULL,
+            address TEXT NOT NULL,
+            chat_id INTEGER UNIQUE NOT NULL,
+            gender TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
+            is_block INTEGER DEFAULT 0
+        );
+        """,
 
--- Kategoriyalar jadvali
-CREATE TABLE IF NOT EXISTS category (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE
-);
+        """
+        CREATE TABLE IF NOT EXISTS category (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            is_active INTEGER DEFAULT 1
+        );
+        """,
 
--- Mahsulotlar jadvali
-CREATE TABLE IF NOT EXISTS product (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    image TEXT NOT NULL,
-    price BIGINT NOT NULL,
-    quantity INT DEFAULT 0,
-    size VARCHAR(50),
-    season VARCHAR(20),
-    gender_type VARCHAR(20),
-    brand VARCHAR(50),
-    category_id INT REFERENCES category(id) ON DELETE CASCADE
-);
+        """
+        CREATE TABLE IF NOT EXISTS product (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            image TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            size TEXT,
+            season TEXT,
+            gender_type TEXT,
+            brand TEXT,
+            category_id INTEGER,
+            FOREIGN KEY (category_id) REFERENCES category(id)
+        );
+        """,
 
--- Buyurtmalar jadvali
-CREATE TABLE IF NOT EXISTS orders (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    product_id INT REFERENCES product(id) ON DELETE CASCADE,
-    quantity INT NOT NULL,
-    price BIGINT NOT NULL,
-    status VARCHAR(50) DEFAULT 'new'
-);
+        """
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chat_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            price INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            status TEXT DEFAULT 'new',
+            FOREIGN KEY (chat_id) REFERENCES user (chat_id),
+            FOREIGN KEY (product_id) REFERENCES product(id)
+        );
+        """
+    ]
 
-    """
 
-    with get_connect() as db:
-        with db.cursor() as dbc:
-            dbc.execute(sql)
-            db.commit()
-create_table() 
+with get_connect() as db:
+    cursor = db.cursor()
+    for sql in tables:
+        sql = sql.strip()
+        if sql:
+            cursor.execute(sql)
+    db.commit()
+    cursor.close()
+
+create_table()

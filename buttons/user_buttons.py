@@ -39,13 +39,19 @@ def category_button():
         
 
 SEASON_BUTTONS = InlineKeyboardMarkup(inline_keyboard=[
+    
+    [ InlineKeyboardButton(text="🌦️ All", callback_data="season_all")
+    ],
     [
         InlineKeyboardButton(text="☀️ Yozgi", callback_data="season_summer"),
         InlineKeyboardButton(text="🍂 Kuzgi", callback_data="season_autumn")
     ],
+    
     [
         InlineKeyboardButton(text="❄️ Qishki", callback_data="season_winter"),
-        InlineKeyboardButton(text="🌸 Bahorgi", callback_data="season_spring"),
-        InlineKeyboardButton(text="🔙 Back", callback_data="season_back")
+        InlineKeyboardButton(text="🌸 Bahorgi", callback_data="season_spring")],
+    
+       
+    [ InlineKeyboardButton(text="🔙 Back", callback_data="season_back")
     ]
 ])

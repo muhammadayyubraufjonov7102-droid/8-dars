@@ -6,7 +6,7 @@ def insert_user(fullname, phone, gender, address, chat_id):
             with db.cursor() as dbc:
                 dbc.execute("""
                     INSERT INTO users (fullname, phone, address, chat_id, gender)
-                    VALUES (%s, %s, %s, %s, %s)
+                    VALUES (?, ?, ?, ?, ?)
                 """, (fullname, phone, address, chat_id, gender))
                 db.commit()
                 return True
